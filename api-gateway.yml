@@ -7,37 +7,21 @@ spring:
         locator:
           enabled: true
           lower-case-service-id: true
-
       routes:
         - id: product-service
           uri: lb://product-service
           predicates:
             - Path=/api/products/**
-          filters:
-            - name: CircuitBreaker
-              args:
-                name: product-cb
-                fallbackUri: forward:/fallback/product
 
         - id: customer-service
           uri: lb://customer-service
           predicates:
             - Path=/api/customers/**
-          filters:
-            - name: CircuitBreaker
-              args:
-                name: customer-cb
-                fallbackUri: forward:/fallback/customer
 
         - id: order-service
           uri: lb://order-service
           predicates:
             - Path=/api/orders/**
-          filters:
-            - name: CircuitBreaker
-              args:
-                name: order-cb
-                fallbackUri: forward:/fallback/order
 
 server:
   port: 8080
