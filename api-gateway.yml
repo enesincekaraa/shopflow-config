@@ -12,16 +12,54 @@ spring:
           uri: lb://product-service
           predicates:
             - Path=/api/products/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: product-cb
+                fallbackUri: forward:/fallback/product
 
         - id: customer-service
           uri: lb://customer-service
           predicates:
             - Path=/api/customers/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: customer-cb
+                fallbackUri: forward:/fallback/customer
 
         - id: order-service
           uri: lb://order-service
           predicates:
             - Path=/api/orders/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: order-cb
+                fallbackUri: forward:/fallback/order
+
+    # Resilience4j Circuit Breaker konfigürasyonu
+    circuitbreaker:
+      resilience4j:
+        instances:
+          product-cb:
+            slidingWindowSize: 10
+            failureRateThreshold: 50
+            waitDurationInOpenState: 30s
+            permittedNumberOfCallsInHalfOpenState: 3
+            automaticTransitionFromOpenToHalfOpenEnabled: true
+          customer-cb:
+            slidingWindowSize: 10
+            failureRateThreshold: 50
+            waitDurationInOpenState: 30s
+            permittedNumberOfCallsInHalfOpenState: 3
+            automaticTransitionFromOpenToHalfOpenEnabled: true
+          order-cb:
+            slidingWindowSize: 10
+            failureRateThreshold: 50
+            waitDurationInOpenState: 30s
+            permittedNumberOfCallsInHalfOpenState: 3
+            automaticTransitionFromOpenToHalfOpenEnabled: true
 
 server:
   port: 8080
@@ -43,6 +81,8 @@ management:
   endpoint:
     health:
       show-details: always
+    circuitbreakers:
+      enabled: true
 
 info:
   app:
